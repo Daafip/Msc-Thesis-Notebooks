@@ -3,3 +3,4 @@
 **/*.json
 Figures/annimation/ensemble_run_till_*.png
 .vs/slnx.sqlite
+Forcing/rhine_example_eWCserver/*
