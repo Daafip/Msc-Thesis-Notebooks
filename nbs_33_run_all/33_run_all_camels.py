@@ -1,17 +1,10 @@
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 import numpy as np
-import os
 from pathlib import Path
-import yaml
 import pandas as pd
-import matplotlib.pyplot as plt
 from datetime import datetime
-import scipy
 import xarray as xr
-from tqdm import tqdm
-import glob
-from devtools import pprint
 from tqdm import tqdm
 import gc
 
@@ -207,8 +200,8 @@ def run(camels_forcing, HRU_id):
     n_particles = 200
 
     sigma_w = 0.45
-    sigma_pp = 0.002
-    sigma_ps = 2.2
+    sigma_pp = 0.003
+    sigma_ps = 2
     sigma_tuple = sigma_pp, sigma_ps, sigma_w
 
     model_name = "HBVLocal"
@@ -231,9 +224,9 @@ def run(camels_forcing, HRU_id):
    
 def main():
     experiment_start_date = "1997-08-01T00:00:00Z"
-    experiment_end_date = "2002-09-01T00:00:00Z"
+    experiment_end_date = "1999-09-01T00:00:00Z"
 
-    for HRU_id_int in [1142500]:
+    for HRU_id_int in [1195100]:
 
         HRU_id = f'{HRU_id_int}'
         if len(HRU_id) < 8:
