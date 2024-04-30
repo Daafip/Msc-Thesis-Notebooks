@@ -22,36 +22,14 @@ from tqdm import tqdm
 import glob
 from devtools import pprint
 from tqdm import tqdm
-
-
-# In[2]:
-
-
-# general eWC
 import ewatercycle
 import ewatercycle.forcing
 import ewatercycle.models
-
-
-# In[3]:
-
-
 from ewatercycle.forcing import sources
 from ewatercycle.models import HBVLocal
 # from ewatercycle_DA.local_models.HBV import HBVLocal
 from ewatercycle_DA import DA
-
-
-# In[4]:
-
-
-# pip install ewatercycle-HBV --upgrade
-
-
-# #### set up paths
-
-# In[5]:
-
+import gc
 
 path = Path.cwd()
 forcing_path = path / "Forcing"
@@ -63,13 +41,8 @@ for path_i in list(paths) + [figure_path]:
     path_i.mkdir(exist_ok=True)
 
 
-# #### Set up experiment info
-
-# In[6]:
-
-
 experiment_start_date = "1997-08-01T00:00:00Z"
-experiment_end_date = "2002-09-01T00:00:00Z"
+experiment_end_date = "2000-09-01T00:00:00Z"
 
 HRU_id_int = 14138900
 HRU_id = f'{HRU_id_int}'
@@ -83,12 +56,6 @@ n_particles = 200
 model_name = "HBVLocal"
 
 save = True
-
-
-# ### Create forcing
-
-# In[7]:
-
 
 camels_forcing = sources.HBVForcing(start_time = experiment_start_date,
                           end_time = experiment_end_date,
@@ -175,7 +142,9 @@ def experiment_run(n_particles, p_max_initial, p_min_initial, s_0, model_name, c
     # create a reference model
     ref_model = ensemble.ensemble_list[0].model
     ds = xr.open_dataset(forcing_path / ref_model.forcing.pr)
-    
+    basin_area = ds.attrs['area basin(m^2)']
+    ds.close()
+
     
     # load observations
     observations = observations_path / f'{HRU_id}_streamflow_qc.txt'
@@ -187,7 +156,7 @@ def experiment_run(n_particles, p_max_initial, p_min_initial, s_0, model_name, c
     df_Q = df_Q.rename(columns=new_header_dict)
     df_Q['Streamflow(cubic feet per second)'] = df_Q['Streamflow(cubic feet per second)'].apply(lambda x: np.nan if x==-999.00 else x)
     df_Q['Q (m3/s)'] = df_Q['Streamflow(cubic feet per second)'] * cubic_ft_to_cubic_m
-    df_Q['Q'] = df_Q['Q (m3/s)'] / ds.attrs['area basin(m^2)'] * 3600 * 24 * 1000 # m3/s -> m/s ->m/d -> mm/d
+    df_Q['Q'] = df_Q['Q (m3/s)'] / basin_area * 3600 * 24 * 1000 # m3/s -> m/s ->m/d -> mm/d
     df_Q.index = df_Q.apply(lambda x: pd.Timestamp(f'{int(x.Year)}-{int(x.Month)}-{int(x.Day)}'),axis=1)
     df_Q.index.name = "time"
     df_Q.drop(columns=['Year','Month', 'Day','Streamflow(cubic feet per second)'],inplace=True)
@@ -222,7 +191,6 @@ def experiment_run(n_particles, p_max_initial, p_min_initial, s_0, model_name, c
     ## run!
     n_timesteps = int((ref_model.end_time - ref_model.start_time) /  ref_model.time_step)
     time = []
-    #lst_state_vector = []
     lst_Q = [] 
     for i in tqdm(range(n_timesteps)):    
         time.append(pd.Timestamp(ref_model.time_as_datetime.date()))
@@ -245,40 +213,41 @@ def experiment_run(n_particles, p_max_initial, p_min_initial, s_0, model_name, c
     
  
     df_ensemble = pd.DataFrame(data=Q_m_arr[:,:len(time)].T,index=time,columns=[f'particle {n}' for n in range(n_particles)])
-    
     del Q_m_arr
-    
-    return df_ensemble, time, ds_obs
-
-
-# In[ ]:
-
-def run(sigma_tuple):
-    sigma_pp, sigma_ps, sigma_w = sigma_tuple
-    df_ensemble, time, ds_obs = experiment_run(n_particles, p_max_initial, p_min_initial, s_0, model_name, camels_forcing, 
-                                                paths, HRU_id, sigma_tuple, H, assimilate_window , save)
 
     mean_ensemble = df_ensemble.T.mean()
     max_ensemble = df_ensemble.T.max()
     min_ensemble = df_ensemble.T.min()
     df_summary = pd.concat([mean_ensemble,max_ensemble,min_ensemble, ds_obs['Q'].sel(time=time).to_pandas()],axis=1)
     df_summary = df_summary.rename(columns={0:"mean",1:"max",2:"min",3:"obs"})
+
+    gc.collect()
+    return df_summary, time
+
+
+# In[ ]:
+
+def run(sigma_tuple):
+    sigma_pp, sigma_ps, sigma_w = sigma_tuple
+    df_summary, time = experiment_run(n_particles, p_max_initial, p_min_initial, s_0, model_name, camels_forcing,
+                                                paths, HRU_id, sigma_tuple, H, assimilate_window , save)
+
+
     
     current_time = str(datetime.now())[:-10].replace(":","_")
     if save:
         df_summary.to_feather(output_path /f'{HRU_id}_pp-{sigma_pp}_sigma_ps-{sigma_ps}_w-{sigma_w}_N-{n_particles}_{current_time}.feather')
         
-    NSE_mean = calc_NSE(df_summary['obs'].values, mean_ensemble.loc[time].values)
-    NSE_mean_log = calc_log_NSE(df_summary['obs'].values, mean_ensemble.loc[time].values)
+    NSE_mean = calc_NSE(df_summary['obs'].values, df_summary['mean'].values)
+    NSE_mean_log = calc_log_NSE(df_summary['obs'].values, df_summary['mean'].values)
     
     np.savetxt(output_path /f'{HRU_id}_pp-{sigma_pp}_sigma_ps-{sigma_ps}_w-{sigma_w}_N-{n_particles}_{current_time}.txt', np.array([NSE_mean, NSE_mean_log]))
     
    
 def main():
-# In[ ]:
 
-    for sigma_pp in [0.0001, 0.001, 0.01, 0.1, 1]:
-        for sigma_ps in [0.01, 0.1, 1, 2, 3, 4, 5]:
+    for sigma_pp in [0.01,0.015, 0.02]:
+        for sigma_ps in [1, 2, 2.5]:
             sigma_w = 0.5   # weights for resampling
             sigma_tuple = sigma_pp, sigma_ps, sigma_w 
             run(sigma_tuple)
