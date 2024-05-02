@@ -132,6 +132,8 @@ def experiment_run(n_particles, p_max_initial, p_min_initial, s_0, model_name, c
     n_timesteps = int((ref_model.end_time - ref_model.start_time) /  ref_model.time_step)
     time = []
     lst_state_vector = []
+    lst_N_eff = []
+    lst_n_resample_indexes = []
     for i in tqdm(range(n_timesteps)):    
         time.append(pd.Timestamp(ref_model.time_as_datetime.date()))
         # update every 3 steps 
@@ -149,6 +151,14 @@ def experiment_run(n_particles, p_max_initial, p_min_initial, s_0, model_name, c
         lst_state_vector.append(summarised_state_vector)
         del state_vector, min, max, mean, summarised_state_vector
         gc.collect()
+
+        lst_N_eff.append(ensemble.ensemble_method.N_eff)
+        if ensemble.ensemble_method.resample:
+            lst_n_resample_indexes.append(
+                len(set(ensemble.ensemble_method.resample_indices)))
+
+        else:
+            lst_n_resample_indexes.append(np.nan)
     
     ensemble.finalize()
 
@@ -186,8 +196,17 @@ def experiment_run(n_particles, p_max_initial, p_min_initial, s_0, model_name, c
     ds_observations = ds_obs['Q'].sel(time=time)
     ds_obs.close()
     ds_combined['Q_obs'] = ds_observations
+    ds_combined['Q_obs'].attrs.update({
+        'history': 'USGS streamflow data obtained from CAMELS dataset',
+        'url':'https://dx.doi.org/10.5065/D6MW2F4D'})
+    ds_combined['Neff'] = np.array(lst_N_eff)
+    ds_combined['Neff'].attrs.update({
+        'info': 'DA debug: 1/sum(weights^2): measure for effective ensemble size'})
+    ds_combined['n_resample'] = np.array(lst_n_resample_indexes)
+    ds_combined['n_resample'].attrs.update({
+        'info': 'DA debug: number of uniquely resampled particles'})
 
-    del time, ds_obs
+    del time, ds_obs, lst_n_resample_indexes, lst_N_eff
 
     gc.collect()
     return ds_combined
@@ -224,10 +243,12 @@ def run(camels_forcing, HRU_id):
    
 def main():
     experiment_start_date = "1997-08-01T00:00:00Z"
-    experiment_end_date = "1999-09-01T00:00:00Z"
+    experiment_end_date = "2007-09-01T00:00:00Z"
 
-    for HRU_id_int in [1195100]:
+    HRU_ids = [path.name[1:8] for path in
+               forcing_path.glob("*_lump_cida_forcing_leap.txt")]
 
+    for HRU_id_int in HRU_ids[0:]:
         HRU_id = f'{HRU_id_int}'
         if len(HRU_id) < 8:
             HRU_id = '0' + HRU_id
@@ -240,6 +261,9 @@ def main():
                                             camels_file=f'{HRU_id}_lump_cida_forcing_leap.txt',
                                             alpha=alpha,
                                             )
+        
+        current_time = str(datetime.now())[:-10].replace(":", "_")
+        print(f'starting {HRU_id} at {current_time}')
         run(camels_forcing, HRU_id)
 
    
