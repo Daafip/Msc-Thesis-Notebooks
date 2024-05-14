@@ -320,6 +320,13 @@ class Experiment(BaseModel):
             forcing_file = forcing_path / forcing.pr
             forcing_file.unlink(missing_ok=True)
 
+        # catch to remove forcing objects if not already.
+        try:
+            self.ensemble.finalize()
+            del self.ensemble.finalize
+        except AttributeError:
+            pass # already deleted previously
+
     
 
 """
@@ -357,14 +364,16 @@ def main_experiment_iteration():
                                 s_max_initial,
                                 s_min_initial)
     alpha = 1.26
+    print_ending = "\n" # should be \n to show in promt, can be removed here by changing to ' '
 
-    # sigma_w_lst = [0.45, 0.5, 0.6, 0.75, 0.8, 1, 1.25, 2, 3, 5, 10]
-    sigma_w_lst = [2, 3, 5, 10]
-    for run_number, sigma_w in enumerate(sigma_w_lst):
-        n_particles = 500
-        lst_sig_p = [1e-2, 1e-3, 1e-4, 1e-5,1e-6,1e-7]
+    # sigma_w_lst = [0.45, 0.5, 0.6, 0.75, 0.8, 1, 1.25, 2, 3,3.5, 5, 10]
+    # sigma_w_lst = [3.5]
+    # for run_number, sigma_w in enumerate(sigma_w_lst):
+    #     n_particles = 500
+    for n_particles in [200, 400, 500, 600, 700, 800]:
+        sigma_w = 3.5
+        lst_sig_p = [1e-4]
         for index, HRU_id_int in enumerate(["01181000"]):
-            # lst_sig_p = [ 0.0000001]
             for sigma_p_Sf in lst_sig_p:
                 HRU_id = f'{HRU_id_int}'
                 if len(HRU_id) < 8:
@@ -383,28 +392,31 @@ def main_experiment_iteration():
                                         experiment_end_date=experiment_end_date,
                                         alpha=alpha,
                                         save=save)
+                try:
+                    print(f'starting sig-{sigma_p_Sf} with sig_w-{sigma_w} at {current_time}',end="\n")
+                    experiment.set_up_forcing()
 
-                print(f'starting sig-{sigma_p_Sf} with sig_w-{sigma_w} at {current_time}',end="\n")
-                ending = "\n"
-                experiment.set_up_forcing()
+                    print(f'init ',end=print_ending)
+                    experiment.initialize()
 
-                print(f'init ',end=ending)
-                experiment.initialize()
+                    print(f'load obs ', end=print_ending)
+                    experiment.load_obs()
 
-                print(f'load obs ', end=ending)
-                experiment.load_obs()
+                    print(f'init da ', end=print_ending)
+                    experiment.initialize_da_method()
 
-                print(f'init da ', end=ending)
-                experiment.initialize_da_method()
+                    print(f'assimilate ', end=print_ending)
+                    experiment.assimilate()
 
-                print(f'assimilate ', end=ending)
-                experiment.assimilate()
+                    print(f'output ', end=print_ending)
+                    experiment.create_combined_ds()
 
-                print(f'output ', end=ending)
-                experiment.create_combined_ds()
-                
-                print(f'cleanup ', end=ending)
-                experiment.finalize()
+                except Exception as e:
+                    print(e)
+
+                finally:
+                    print(f'cleanup ', end=print_ending)
+                    experiment.finalize()
 
                 del experiment
                 gc.collect()
