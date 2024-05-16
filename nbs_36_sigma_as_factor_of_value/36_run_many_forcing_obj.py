@@ -366,15 +366,15 @@ def main_experiment_iteration():
     alpha = 1.26
     print_ending = "\n" # should be \n to show in promt, can be removed here by changing to ' '
 
+
     # sigma_w_lst = [0.45, 0.5, 0.6, 0.75, 0.8, 1, 1.25, 2, 3,3.5, 5, 10]
-    # sigma_w_lst = [3.5]
-    # for run_number, sigma_w in enumerate(sigma_w_lst):
-    #     n_particles = 500
-    for n_particles in [200, 400, 500, 600, 700, 800]:
-        sigma_w = 3.5
+    sigma_w_lst = [3.5]
+    for run_number, sigma_w in enumerate(sigma_w_lst):
+        n_particles = 500
         lst_sig_p = [1e-4]
         for index, HRU_id_int in enumerate(["01181000"]):
             for sigma_p_Sf in lst_sig_p:
+
                 HRU_id = f'{HRU_id_int}'
                 if len(HRU_id) < 8:
                     HRU_id = '0' + HRU_id
@@ -393,7 +393,7 @@ def main_experiment_iteration():
                                         alpha=alpha,
                                         save=save)
                 try:
-                    print(f'starting sig-{sigma_p_Sf} with sig_w-{sigma_w} at {current_time}',end="\n")
+                    print(f'starting {n_particles} at {current_time}',end="\n")
                     experiment.set_up_forcing()
 
                     print(f'init ',end=print_ending)
