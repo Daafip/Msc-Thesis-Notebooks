@@ -58,16 +58,17 @@ class Experiment(BaseModel):
     @staticmethod
     def calc_NSE(Qo, Qm):
         QoAv = np.mean(Qo)
-        ErrUp = np.sum((Qm - Qo) ** 2)
+        ErrUp = np.sum((Qo - Qm) ** 2)
         ErrDo = np.sum((Qo - QoAv) ** 2)
         return 1 - (ErrUp / ErrDo)
 
     @staticmethod
     def calc_log_NSE(Qo, Qm):
         QoAv = np.mean(Qo)
-        ErrUp = np.sum((np.log(Qm) - np.log(Qo)) ** 2)
+        ErrUp = np.sum((np.log(Qo) - np.log(Qm)) ** 2)
         ErrDo = np.sum((np.log(Qo) - np.log(QoAv)) ** 2)
         return 1 - (ErrUp / ErrDo)
+
 
     def set_up_forcing(self):
         self.make_paths()
@@ -375,7 +376,7 @@ def main_experiment_iteration():
     sigma_w_lst = [1, 3, 5, 7]
     for run_number, sigma_w in enumerate(sigma_w_lst):
         n_particles = 500
-        lst_sig_p = [1e-1, 1e-3, 1e-5, 1e-7]
+        lst_sig_p = [1e-1, 1e-3, 1e-5, 1e-7] # in the report this becomes epsilon_p as of v39
         if run_number in [0]: # tweak for breaks inbetween
             HRU_ids_adj = HRU_ids[13:]
         else:
