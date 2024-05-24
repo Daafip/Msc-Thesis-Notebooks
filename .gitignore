@@ -4,3 +4,5 @@
 Figures/annimation/ensemble_run_till_*.png
 .vs/slnx.sqlite
 Forcing/rhine_example_eWCserver/*
+nbs_40_run_all_camels/Forcing/*.nc
+nbs_39_formalise_algorithm/Forcing/*.nc

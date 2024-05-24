@@ -442,7 +442,7 @@ Check list for a new experiment:
 def main():
     """Main script"""
     forcing_path = Path.cwd() / "Forcing"
-    HRU_ids = [path.name[1:8] for path in
+    HRU_ids = [path.name[:8] for path in
                forcing_path.glob("*_lump_cida_forcing_leap.txt")]
 
     sigma_w = 2
@@ -456,69 +456,72 @@ def main():
     print(
         f'based on {total_nruns}run @ {avg_run_length}hrs/run = est.finish: {estimated_finish.strftime("%Y-%m-%d %H:%M")}')
 
-    for HRU_id_int in HRU_ids:
-        # initial guess
-        try:
-            p_min_initial_spinup = np.array([0, 0.2, 40, .5, .001, 1, .01, .0001, 6])
-            p_max_initial_spinup = np.array([8, 1, 800, 4, .3, 10, .1, .01, 0.1])
+    for index, HRU_id_int in enumerate(HRU_ids):
+        if index < 50:
+            pass
+        else:
+            # initial guess
+            try:
+                p_min_initial_spinup = np.array([0, 0.2, 40, .5, .001, 1, .01, .0001, 6])
+                p_max_initial_spinup = np.array([8, 1, 800, 4, .3, 10, .1, .01, 0.1])
 
-            s_max_initial_spinup = np.array([10, 250, 100, 40, 150])
-            s_min_initial_spinup = np.array([0, 150, 0, 0, 0])
+                s_max_initial_spinup = np.array([10, 250, 100, 40, 150])
+                s_min_initial_spinup = np.array([0, 150, 0, 0, 0])
 
-            storage_parameter_bounds_spinup = (p_min_initial_spinup,
-                                               p_max_initial_spinup,
-                                               s_max_initial_spinup,
-                                               s_min_initial_spinup)
-            experiment_start_date = "1997-08-01T00:00:00Z"
-            experiment_end_date = "1999-09-01T00:00:00Z"
+                storage_parameter_bounds_spinup = (p_min_initial_spinup,
+                                                   p_max_initial_spinup,
+                                                   s_max_initial_spinup,
+                                                   s_min_initial_spinup)
+                experiment_start_date = "1997-08-01T00:00:00Z"
+                experiment_end_date = "1999-09-01T00:00:00Z"
 
-            spin_up = True
-            ds_spinup = run_experiment(HRU_id_int,
-                                       storage_parameter_bounds_spinup,
-                                       experiment_start_date,
-                                       experiment_end_date,
-                                       spin_up,
-                                       sigma_w,
-                                       sigma_p_Sf,
-                                      )
-            ds_cropped = ds_spinup.sel(time=ds_spinup.time[90:]) # 3 months of spinup time
+                spin_up = True
+                ds_spinup = run_experiment(HRU_id_int,
+                                           storage_parameter_bounds_spinup,
+                                           experiment_start_date,
+                                           experiment_end_date,
+                                           spin_up,
+                                           sigma_w,
+                                           sigma_p_Sf,
+                                          )
+                ds_cropped = ds_spinup.sel(time=ds_spinup.time[90:]) # 3 months of spinup time
 
-            # use the result to get a ballpark max/min
-            param_names = ["Imax", "Ce", "Sumax", "Beta", "Pmax", "Tlag", "Kf", "Ks", "FM"]
-            p_min_initial = np.zeros(len(param_names))
-            p_max_initial = np.zeros(len(param_names))
-            for index, param in enumerate(param_names):
-                p_min_initial[index] = ds_cropped[param].sel(summary_stat='min').mean().to_numpy()
-                p_max_initial[index] = ds_cropped[param].sel(summary_stat='max').mean().to_numpy()
+                # use the result to get a ballpark max/min
+                param_names = ["Imax", "Ce", "Sumax", "Beta", "Pmax", "Tlag", "Kf", "Ks", "FM"]
+                p_min_initial = np.zeros(len(param_names))
+                p_max_initial = np.zeros(len(param_names))
+                for index, param in enumerate(param_names):
+                    p_min_initial[index] = ds_cropped[param].sel(summary_stat='min').mean().to_numpy()
+                    p_max_initial[index] = ds_cropped[param].sel(summary_stat='max').mean().to_numpy()
 
-            stor_names = ["Si", "Su", "Sf", "Ss", "Sp"]
-            s_min_initial = np.zeros(len(stor_names))
-            s_max_initial = np.zeros(len(stor_names))
-            for index, stor in enumerate(stor_names):
-                s_min_initial[index] = ds_cropped[stor].sel(summary_stat='min').mean().to_numpy()
-                s_max_initial[index] = ds_cropped[stor].sel(summary_stat='max').mean().to_numpy()
+                stor_names = ["Si", "Su", "Sf", "Ss", "Sp"]
+                s_min_initial = np.zeros(len(stor_names))
+                s_max_initial = np.zeros(len(stor_names))
+                for index, stor in enumerate(stor_names):
+                    s_min_initial[index] = ds_cropped[stor].sel(summary_stat='min').mean().to_numpy()
+                    s_max_initial[index] = ds_cropped[stor].sel(summary_stat='max').mean().to_numpy()
 
-            storage_parameter_bounds = (p_min_initial,
-                                        p_max_initial,
-                                        s_max_initial,
-                                        s_min_initial)
+                storage_parameter_bounds = (p_min_initial,
+                                            p_max_initial,
+                                            s_max_initial,
+                                            s_min_initial)
 
-            # Run longer
-            experiment_start_date = "1997-08-01T00:00:00Z"
-            experiment_end_date = "2002-09-01T00:00:00Z"
+                # Run longer
+                experiment_start_date = "1997-08-01T00:00:00Z"
+                experiment_end_date = "2002-09-01T00:00:00Z"
 
-            spin_up = False
-            run_experiment(HRU_id_int,
-                           storage_parameter_bounds,
-                           experiment_start_date,
-                           experiment_end_date,
-                           spin_up,
-                           sigma_w,
-                           sigma_p_Sf,
-                           )
+                spin_up = False
+                run_experiment(HRU_id_int,
+                               storage_parameter_bounds,
+                               experiment_start_date,
+                               experiment_end_date,
+                               spin_up,
+                               sigma_w,
+                               sigma_p_Sf,
+                               )
 
-        except Exception as e:
-            print(e)
+            except Exception as e:
+                print(e)
 
 
 

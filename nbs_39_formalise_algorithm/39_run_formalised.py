@@ -447,11 +447,14 @@ def main():
 
     sigma_w_lst = [2, 5]
     sigma_p_Sf_lst = [1e-3, 1e-5]
-    # sigma_w_p_lst = [[2, 1e-7], [5, 1e-7], [7, 1e-7],
-    #                  [7, 1e-3], [7, 1e-5],
-    #                  [2, 1e-2], [5, 1e-2], [7, 1e-2],
-    #                  [9, 1e-2], [9, 1e-3], [9, 1e-5],  [9, 1e-7]]
-    sigma_w_p_lst = [[2, 1e-4], [2, 5e-4], [2.75, 5e-4], [2.75, 1e-3]]
+    sigma_w_p_lst = [[2, 1e-7], [5, 1e-7], [7, 1e-7],
+                     [7, 1e-3], [7, 1e-5],
+                     [2, 1e-2], [5, 1e-2], [7, 1e-2],
+                     [9, 1e-2], [9, 1e-3], [9, 1e-5],  [9, 1e-7]]
+
+
+    # sigma_w_p_lst = [[2, 1e-4], [2, 5e-4], [2.75, 5e-4], [2.75, 1e-3]]
+
 
     # in the report sigma_p_Sf is epsilon_p
 
@@ -464,7 +467,7 @@ def main():
         f'based on {total_nruns}run @ {avg_run_length}hrs/run = est.finish: {estimated_finish.strftime("%Y-%m-%d %H:%M")}')
 
     for run_number, HRU_id_int in enumerate(HRU_ids):
-        if run_number < 3:
+        if run_number < 23:
             pass
 
         else:
