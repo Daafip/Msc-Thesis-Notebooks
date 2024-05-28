@@ -57,6 +57,8 @@ class Experiment(BaseModel):
 
     @staticmethod
     def calc_NSE(Qo, Qm):
+        Qo[Qo == 0] = 1e-8
+        Qm[Qm == 0] = 1e-8
         QoAv = np.mean(Qo)
         ErrUp = np.sum((Qo - Qm) ** 2)
         ErrDo = np.sum((Qo - QoAv) ** 2)
@@ -64,6 +66,8 @@ class Experiment(BaseModel):
 
     @staticmethod
     def calc_log_NSE(Qo, Qm):
+        Qo[Qo == 0] = 1e-8
+        Qm[Qm == 0] = 1e-8
         QoAv = np.mean(Qo)
         ErrUp = np.sum((np.log(Qo) - np.log(Qm)) ** 2)
         ErrDo = np.sum((np.log(Qo) - np.log(QoAv)) ** 2)
@@ -442,14 +446,21 @@ Check list for a new experiment:
 def main():
     """Main script"""
     forcing_path = Path.cwd() / "Forcing"
-    HRU_ids = [path.name[:8] for path in
-               forcing_path.glob("*_lump_cida_forcing_leap.txt")]
-
+    # HRU_ids = [path.name[1:8] for path in
+    #            forcing_path.glob("*_lump_cida_forcing_leap.txt")]
+    HRU_ids = ['07301500',
+               '08023080',
+               '08104900',
+               '08178880',
+               '08189500',
+               '09535100']
+    n_start_skip = 0
+    n_end_skip = 0
     sigma_w = 2
     sigma_p_Sf = 1e-3 # in the report this is epsilon_p
 
     # total_nruns = len(HRU_ids) * len(sigma_w_lst) * len(sigma_p_Sf_lst)
-    total_nruns = len(HRU_ids)
+    total_nruns = len(HRU_ids) - n_start_skip - n_end_skip 
     avg_run_length = 0.3  # hr
     total_hrs = total_nruns * avg_run_length
     estimated_finish = datetime.now() + timedelta(hours=total_hrs)
@@ -457,7 +468,7 @@ def main():
         f'based on {total_nruns}run @ {avg_run_length}hrs/run = est.finish: {estimated_finish.strftime("%Y-%m-%d %H:%M")}')
 
     for index, HRU_id_int in enumerate(HRU_ids):
-        if index < 50:
+        if index < n_start_skip or index > (len(HRU_ids)-n_end_skip):
             pass
         else:
             # initial guess
