@@ -280,48 +280,52 @@ class Experiment(BaseModel):
                                      "s_min_initial":s_min_initial
                                  }
                                  )
+        try:
+            ds_obs = xr.open_dataset(self.ds_obs_dir)
+            ds_observations = ds_obs['Q'].sel(time=self.time)
+            ds_obs.close()
+            ds_combined['Q_obs'] = ds_observations
+            ds_combined['Q_obs'].attrs.update({
+                'history': 'USGS streamflow data obtained from CAMELS dataset',
+                'url': 'https://dx.doi.org/10.5065/D6MW2F4D'})
 
-        ds_obs = xr.open_dataset(self.ds_obs_dir)
-        ds_observations = ds_obs['Q'].sel(time=self.time)
-        ds_obs.close()
-        ds_combined['Q_obs'] = ds_observations
-        ds_combined['Q_obs'].attrs.update({
-            'history': 'USGS streamflow data obtained from CAMELS dataset',
-            'url': 'https://dx.doi.org/10.5065/D6MW2F4D'})
+        except Exception as e:
+            print(e)
+       
+        finally:
+            df_n_eff = pd.DataFrame(index=self.time,
+                                    data=self.lst_N_eff,
+                                    columns=['Neff'])
+            df_n_eff.index.name = 'time'
+            ds_combined['Neff'] = df_n_eff['Neff']
+            ds_combined['Neff'].attrs.update({
+                'info': 'DA debug: 1/sum(weights^2): measure for effective ensemble size'})
 
-        df_n_eff = pd.DataFrame(index=self.time,
-                                data=self.lst_N_eff,
-                                columns=['Neff'])
-        df_n_eff.index.name = 'time'
-        ds_combined['Neff'] = df_n_eff['Neff']
-        ds_combined['Neff'].attrs.update({
-            'info': 'DA debug: 1/sum(weights^2): measure for effective ensemble size'})
-
-        df_n_resample = pd.DataFrame(index=self.time,
-                                     data=self.lst_n_resample_indexes,
-                                     columns=['n_resample'])
-        df_n_resample.index.name = 'time'
-        ds_combined['n_resample'] = df_n_resample['n_resample']
-        ds_combined['n_resample'].attrs.update({
-            'info': 'DA debug: number of uniquely resampled particles'})
-
-        current_time = str(datetime.now())[:-10].replace(":", "_")
-        sigma_pp, sigma_ps, sigma_w, sigma_p_Sf = self.sigma_tuple
-        if self.save:
-            forcing_path, output_path, observations_path = self.paths
-            file_dir = output_path / (
-                f'{self.HRU_id}_psf-{sigma_p_Sf}'
-                f'_w-{sigma_w}_N-{self.n_particles}_'
-                f'{current_time}.nc')
-            ds_combined.to_netcdf(file_dir)
+            df_n_resample = pd.DataFrame(index=self.time,
+                                         data=self.lst_n_resample_indexes,
+                                         columns=['n_resample'])
+            df_n_resample.index.name = 'time'
+            ds_combined['n_resample'] = df_n_resample['n_resample']
+            ds_combined['n_resample'].attrs.update({
+                'info': 'DA debug: number of uniquely resampled particles'})
 
 
-        del (self.time, ds_obs, self.lst_n_resample_indexes,
-             self.lst_N_eff, df_n_eff, df_n_resample)
+            del (self.time, ds_obs, self.lst_n_resample_indexes,
+                 self.lst_N_eff, df_n_eff, df_n_resample)
 
-        gc.collect()
-
-        return ds_combined
+            gc.collect()
+            current_time = str(datetime.now())[:-10].replace(":", "_")
+            sigma_pp, sigma_ps, sigma_w, sigma_p_Sf = self.sigma_tuple
+            if self.save:
+                forcing_path, output_path, observations_path = self.paths
+                file_dir = output_path / (
+                    f'{self.HRU_id}_psf-{sigma_p_Sf}'
+                    f'_w-{sigma_w}_N-{self.n_particles}_'
+                    f'{current_time}.nc')
+                ds_combined.to_netcdf(file_dir)
+            
+            return ds_combined
+            
 
     def finalize(self):
         forcing_path = self.paths[0]
@@ -448,12 +452,7 @@ def main():
     forcing_path = Path.cwd() / "Forcing"
     # HRU_ids = [path.name[1:8] for path in
     #            forcing_path.glob("*_lump_cida_forcing_leap.txt")]
-    HRU_ids = ['07301500',
-               '08023080',
-               '08104900',
-               '08178880',
-               '08189500',
-               '09535100']
+    HRU_ids = [8178880]
     n_start_skip = 0
     n_end_skip = 0
     sigma_w = 2
