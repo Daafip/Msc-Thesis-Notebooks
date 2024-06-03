@@ -15,6 +15,7 @@ Once a FAIR way of acessing the camels data datset is created, this will be remo
 # File system
 This started off a as WIP repo, so it does contain _all_ files used in running and analysing code, but the downside is the (earlier) code is messy and not organised. 
 In some cases seperate repos have been used, these are explained. Most of the (unorganised code) is also here though.
+Warning this repo is LARGE! Cloning it all in not recomended. Optimisation will take place later to remove forcing and large model runs. For now it also serves as a backup. 
 
 ## layout
 - `0-29_development`: Notebooks from start to the end of development stages. Syntax and good practices still change a lot here
