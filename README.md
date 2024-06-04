@@ -20,13 +20,12 @@ Warning this repo is LARGE! Cloning it all in not recomended. Optimisation will 
 ## layout
 - `0-29_development`: Notebooks from start to the end of development stages. Syntax and good practices still change a lot here
 - `30-43_application_and_analysis`: This is the start of the experiment phase, moving away from notebooks and to `.py` files.
-- Everything else (Forcing, Observations, notebooks '1-5'): demonstration as included at the end of the thesis report:
-    - Three examples of running DA are show. Then then the lorenz model is shown and lastly using caravan data in eWaterCycle. 
-        1. A classical example where all (hyper)parameters are defined beforehand. 
-        1. A on the fly data assimilation where the (hyper)parameter for the data assimilation experiment are added after the model has already run.
-        1. A calibration run for a hydrological model saving all the states and parameters specified.
-        1. Show case use of the Lorenz model in ewatercycle, which can be found [here](https://github.com/Daafip/ewatercycle-lorenz). 
-        1. The Carvan dataset was made accessible in eWatercycle. An interactive map show casing the catchments can be found at [https://www.ewatercycle.org/caravan-map/](www.ewatercycle.org/caravan-map/). The pull request can be found [here](https://github.com/eWaterCycle/ewatercycle/pull/407)
+- Everything else (Forcing, Observations, notebooks '1-5'): demonstration as included at the end of the thesis report. Three examples of running DA are show. Then then the lorenz model is shown and lastly using caravan data in eWaterCycle. 
+    1. A classical example where all (hyper)parameters are defined beforehand. 
+    1. A on the fly data assimilation where the (hyper)parameter for the data assimilation experiment are added after the model has already run.
+    1. A calibration run for a hydrological model saving all the states and parameters specified.
+    1. Show case use of the Lorenz model in ewatercycle, which can be found [here](https://github.com/Daafip/ewatercycle-lorenz). 
+    1. The Carvan dataset was made accessible in eWatercycle. An interactive map show casing the catchments can be found at [https://www.ewatercycle.org/caravan-map/](www.ewatercycle.org/caravan-map/). The pull request can be found [here](https://github.com/eWaterCycle/ewatercycle/pull/407)
 
 ## other code repos
 - Those used for running experiments are practically identitical but save you from cloning this whole repo:
