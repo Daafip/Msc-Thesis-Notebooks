@@ -1,5 +1,5 @@
 # MSc Thesis notebook repo - David Haasnoot
-Code for Thesis: 'analaysing deficiencies in hydrological models using data assimilation. ' which runs the requires [eWaterCycle](https://www.ewatercycle.org/) platform to be installed, easily done [with these instructions](https://github.com/eWaterCycle/ewatercycle). <br>
+Code for Thesis: 'Analysing deficiencies in hydrological models using data assimilation.' which runs the requires [eWaterCycle](https://www.ewatercycle.org/) platform to be installed, easily done [with these instructions](https://github.com/eWaterCycle/ewatercycle). <br>
 Some notebook require geospatial packages, namely `geopandas` and `contexitly` which aren't included in the eWatercycle environment. <br>
 I would advise to make a new environment for the geospatial analysis.<br>
 
