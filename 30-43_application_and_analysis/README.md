@@ -5,7 +5,7 @@
 - `30-43_application_and_analysis`: This is the start of the experiment phase, moving away from notebooks and to `.py` files.
     - `nbs_30_rewrite_to_function`: Here we move away from the notebook approach we had and instead run the function as `30.82_Camels_itterate.py` for the first time
     - `nbs_31_traditional_callibration`: This run traditional calibration in `run_trad_callibration.py`, sorry for the typo. 
-    - `nbs_32_Use_Neff`: Here we adjust the particle filter scheme to use a threshold to resample, only if `N` < `N_eff` will resampling take place. $N_ef = f_n_particles * N$ 
+    - `nbs_32_Use_Neff`: Here we adjust the particle filter scheme to use a threshold to resample, only if `N` < `N_eff` will resampling take place. $N_{eff} = fn_{particles} * N$ 
     - `nbs_33_run_diff_sig_s`: here we change the hyperparameter which causes perturbation to be different for each of model parameters/states: sigma of the state vector = `sig_s`
     - `nbs_34_run_lower_sf`: More variation in `sig_s`
     - `nbs_35_debug_crashing`: Here we had issues with WSL consuming too much RAM in combination with DASK. Fixed it by switching to linux
