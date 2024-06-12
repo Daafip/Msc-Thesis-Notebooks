@@ -1,8 +1,10 @@
 # MSc Thesis notebook repo - David Haasnoot
-Code for Thesis which runs the requires [eWaterCycle](https://www.ewatercycle.org/) platform to be installed, easily done [with these instructions](https://github.com/eWaterCycle/ewatercycle). 
-Some notebook require geospatial packages, namely `geopandas` and `contexitly` which aren't included in the eWatercycle environment. 
-I would advise to make a new environment for this.
-Runs models in eWaterCycle environment, applies DA to said models
+Code for Thesis: 'analaysing deficiencies in hydrological models using data assimilation. ' which runs the requires [eWaterCycle](https://www.ewatercycle.org/) platform to be installed, easily done [with these instructions](https://github.com/eWaterCycle/ewatercycle). <br>
+Some notebook require geospatial packages, namely `geopandas` and `contexitly` which aren't included in the eWatercycle environment. <br>
+I would advise to make a new environment for the geospatial analysis.<br>
+
+The code runs models in eWaterCycle environment, applies data assimilation to said models and generates results.<br>
+For more info see the thesis hosted here ... 
 
 
 # Data
@@ -18,8 +20,8 @@ In some cases seperate repos have been used, these are explained. Most of the (u
 Warning this repo is LARGE! Cloning it all in not recomended. Optimisation will take place later to remove forcing and large model runs. For now it also serves as a backup. 
 
 ## layout
-- `0-29_development`: Notebooks from start to the end of development stages. Syntax and good practices still change a lot here
-- `30-43_application_and_analysis`: This is the start of the experiment phase, moving away from notebooks and to `.py` files.
+- `0-29_development`: Notebooks from start to the end of development stages. Syntax and good practices still change a lot here. The subdirectory also contains a readme with explanation of the folders. 
+- `30-43_application_and_analysis`: This is the start of the experiment phase, moving away from notebooks and to `.py` files.  The subdirectory also contains a readme with explanation of the folders. 
 - Everything else (Forcing, Observations, notebooks '1-5'): demonstration as included at the end of the thesis report. Three examples of running DA are show. Then then the lorenz model is shown and lastly using caravan data in eWaterCycle. 
     1. A classical example where all (hyper)parameters are defined beforehand. 
     1. A on the fly data assimilation where the (hyper)parameter for the data assimilation experiment are added after the model has already run.
@@ -41,17 +43,3 @@ Warning this repo is LARGE! Cloning it all in not recomended. Optimisation will 
  
 - Main framework:
     - [eWaterCycle-DA](https://github.com/Daafip/eWaterCycle-DA) Main framework made in this thesis is found here with [documentation](https://ewatercycle-da.readthedocs.io/en/latest)
-
-
-## Useful notes:
-```bash
-wsl --shutdown
-netsh winsock reset
-netsh int ip reset all
-netsh winhttp reset proxy
-ipconfig /flushdns
-netsh winsock reset
-shutdown /r
-
-```
-`jupyter nbconvert "mynotebook.ipynb" --to python`
