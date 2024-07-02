@@ -7,3 +7,4 @@ Forcing/rhine_example_eWCserver/*
 nbs_40_run_all_camels/Forcing/*.nc
 nbs_39_formalise_algorithm/Forcing/*.nc
 .idea/*
+30-43_application_and_analysis/nbs_43_analyse_diff_best_callibrate/Forcing/*
