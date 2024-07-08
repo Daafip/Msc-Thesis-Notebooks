@@ -4,7 +4,7 @@ Some notebook require geospatial packages, namely `geopandas` and `contexitly` w
 I would advise to make a new environment for the geospatial analysis.<br>
 
 The code runs models in eWaterCycle environment, applies data assimilation to said models and generates results.<br>
-For more info see the thesis hosted here ... 
+For more info see the thesis hosted on [repository.tudelft.nl](https://repository.tudelft.nl)
 
 
 # Data
@@ -29,17 +29,23 @@ Warning this repo is LARGE! Cloning it all in not recomended. Optimisation will 
     1. Show case use of the Lorenz model in ewatercycle, which can be found [here](https://github.com/Daafip/ewatercycle-lorenz). 
     1. The Carvan dataset was made accessible in eWatercycle. An interactive map show casing the catchments can be found at [https://www.ewatercycle.org/caravan-map/](https://www.ewatercycle.org/caravan-map/). The pull request can be found [here](https://github.com/eWaterCycle/ewatercycle/pull/407)
 
-## other code repos
+# Other Repositories created during this thesis
+Alongside the notebooks shown in this repo the models and framework used were developed as a part of this thesis. <br>
+Some of the experiment code was also split into different repos to make switching between running locally and on SURF easier. 
+
+## experiments
 - Those used for running experiments are practically identitical but save you from cloning this whole repo:
     - [run_experiment](https://github.com/Daafip/run_experiment) runs experiment for 671 catchmetns with a provided hyperparameter set storing min, max and weighted mean. 
     - [run_experiment_best](https://github.com/Daafip/run_experiment_best) same as run experiment but also stores the highest weight
     - [run_calibration](https://github.com/Daafip/run_calibration) Runs a monte carlo calibration for 500 iterations across 671 catchments
 
+## model
 - Model repos:
     - [HBV BMI](https://github.com/Daafip/HBV-bmi) Basic Model Interface code for the HBV which is run by the ewatercycle-HBV
     - [ewatercycle-HBV](https://github.com/Daafip/ewatercycle-hbv) Wrapper for the HBV BMI which interfaces with the user, with [documentation](https://ewatercycle-hbv.readthedocs.io/en/latest/index.html). 
     - [Lorenz BMI](https://github.com/Daafip/lorenz-bmi) Basic Model Interface code for the HBV which is run by the ewatercycle-lorenz
     - [ewatercycle-lorenz](https://github.com/Daafip/ewatercycle-lorenz) Wrapper for the Lorenz model BMI which interfaces with the user, with [documentation](https://ewatercycle-lorenz.readthedocs.io/en/latest/index.html).
  
-- Main framework:
+ ## Framework
+ - Data assimilation framework:
     - [eWaterCycle-DA](https://github.com/Daafip/eWaterCycle-DA) Main framework made in this thesis is found here with [documentation](https://ewatercycle-da.readthedocs.io/en/latest)
